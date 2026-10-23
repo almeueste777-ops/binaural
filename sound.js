@@ -205,16 +205,41 @@ async function startSound(o) {
     el.play().catch(() => {});
   }
 
+  const master = ctx.createGain(); // tonuri + muzică (prin vol) și vocea merg aici, apoi la ieșire
+  vol.connect(master);
+
+  // înregistrare cu voce reală (de pe internet), trecută prin același mixaj ca tonurile
+  if (o.voiceUrl) {
+    const el = new Audio();
+    el.crossOrigin = 'anonymous'; el.preload = 'auto'; el.setAttribute('playsinline', '');
+    el.src = o.voiceUrl;
+    const vg = ctx.createGain(); vg.gain.value = (o.voiceV / 100) ** 2;
+    ctx.createMediaElementSource(el).connect(vg);
+    vg.connect(master);
+    e.voiceEl = el; e.voiceG = vg; e.fade = fade;
+    if (o.voiceStart) el.addEventListener('loadedmetadata', () => { el.currentTime = o.voiceStart; }, { once: true });
+    el.onerror = () => { if (o.onVoiceError) o.onVoiceError(); };
+    let terminat = false;
+    const finVoce = () => { // bazele se sting lin, apoi sesiunea se încheie
+      if (terminat) return; terminat = true;
+      try { fade.gain.cancelScheduledValues(ctx.currentTime); fade.gain.setValueAtTime(fade.gain.value, ctx.currentTime); fade.gain.linearRampToValueAtTime(0, ctx.currentTime + 8); } catch (_) {}
+      setTimeout(() => { if (eng === e) finalSunet(); }, 8500);
+    };
+    el.onended = finVoce;
+    if (o.voiceEnd) el.addEventListener('timeupdate', () => { if (el.currentTime >= o.voiceEnd) { el.pause(); finVoce(); } });
+    setTimeout(() => { if (eng === e) el.play().catch(() => { if (o.onVoiceError) o.onVoiceError(); }); }, 4000);
+  }
+
   // ieșire prin <audio> ca să meargă cu comutatorul de silențios al iPhone-ului și în fundal
   let prinAudio = false;
   try {
     const dest = ctx.createMediaStreamDestination();
-    vol.connect(dest);
+    master.connect(dest);
     const a = new Audio(); a.srcObject = dest.stream; a.setAttribute('playsinline', '');
     await a.play();
     e.audioEl = a; prinAudio = true;
   } catch (_) {}
-  if (!prinAudio) vol.connect(ctx.destination);
+  if (!prinAudio) master.connect(ctx.destination);
 
   oscs.forEach(x => { x.start(t0); x.stop(t0 + total + 1); });
   if (nz) { nz.start(t0); nz.stop(t0 + total + 1); }
@@ -240,8 +265,16 @@ function tickSunet() {
 
 async function pauzaSunet() {
   const e = eng; if (!e) return false;
-  if (e.ctx.state === 'running') { await e.ctx.suspend(); if (e.fileEl) e.fileEl.pause(); return true; }
-  await e.ctx.resume(); if (e.fileEl) e.fileEl.play().catch(() => {}); return false;
+  if (e.ctx.state === 'running') {
+    await e.ctx.suspend();
+    if (e.fileEl) e.fileEl.pause();
+    if (e.voiceEl) e.voiceEl.pause();
+    return true;
+  }
+  await e.ctx.resume();
+  if (e.fileEl) e.fileEl.play().catch(() => {});
+  if (e.voiceEl && e.voiceEl.currentTime > 0) e.voiceEl.play().catch(() => {});
+  return false;
 }
 
 function stopSound(tacut) {
@@ -252,6 +285,7 @@ function stopSound(tacut) {
   try { e.wake && e.wake.release(); } catch (_) {}
   try { e.audioEl && e.audioEl.pause(); } catch (_) {}
   try { e.fileEl && (e.fileEl.pause(), URL.revokeObjectURL(e.fileEl.src)); } catch (_) {}
+  try { if (e.voiceEl) { e.voiceEl.onended = null; e.voiceEl.onerror = null; e.voiceEl.pause(); e.voiceEl.removeAttribute('src'); e.voiceEl.load(); } } catch (_) {}
   try { e.ctx.close(); } catch (_) {}
   if (!tacut && e.o.onEnd) e.o.onEnd();
 }

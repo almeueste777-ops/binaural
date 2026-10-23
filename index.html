@@ -83,6 +83,10 @@ th,td{padding:6px 4px;text-align:left;border-bottom:1px solid #2a2f5e}
 dialog{background:var(--card);color:var(--txt);border:1px solid #3a4080;border-radius:16px;padding:20px;width:min(92vw,420px)}
 dialog::backdrop{background:#000a}
 dialog h3{margin:0 0 8px}
+.rec{border-top:1px solid #2a2f5e;padding:12px 0}
+.rec p{margin:4px 0 8px}
+.tag{font-size:.78rem;color:var(--acc2);margin-left:4px}
+a{color:var(--acc)}
 </style>
 </head>
 <body>
@@ -209,6 +213,26 @@ dialog h3{margin:0 0 8px}
     <div class="bar"><i id="gprog"></i></div>
    </div>
   </section>
+
+  <section class="panel">
+   <h2>🎙 Înregistrări cu voci reale</h2>
+   <p>Sesiuni de hipnoză și meditație ghidată, citite de oameni, cu licență Creative Commons (uz necomercial). Sunt în <b>engleză</b> și se încarcă de pe Internet Archive, deci ai nevoie de internet. Caută în rest o voce românească cu licență liberă: n-am găsit nicio sesiune de hipnoză în română.</p>
+   <div id="reclist"></div>
+   <div id="rstage" hidden>
+    <h2 id="rtitlu" style="margin-bottom:8px"></h2>
+    <div class="time" id="rinfo"></div>
+    <label for="rvolv">Volum voce</label>
+    <input type="range" id="rvolv" min="0" max="100" value="80">
+    <label class="chk"><input type="checkbox" id="rfond"> Cu unde binaurale și zgomot în fundal (căști)</label>
+    <label for="rvolf">Volum fundal</label>
+    <input type="range" id="rvolf" min="0" max="100" value="18">
+    <div class="row" style="margin-top:12px">
+     <button class="small" id="rpause" style="flex:1">⏸ Pauză</button>
+     <button class="small no" id="rstop" style="flex:1">■ Oprește</button>
+    </div>
+   </div>
+   <p class="mic">Nu le asculta la volan. Sesiunile de somn te lasă să adormi; cele de relaxare te trezesc cu numărătoare. Sugestiile din ele sunt ale autorilor: dacă nu înțelegi engleza, nu le folosi.</p>
+  </section>
  </section>
 
  <!-- ================= CARDURI ================= -->
@@ -284,6 +308,7 @@ dialog h3{margin:0 0 8px}
 <script src="journal.js"></script>
 <script src="sound.js"></script>
 <script src="guide.js"></script>
+<script src="recordings.js"></script>
 <script src="cards.js"></script>
 <script>arataTab(citeste('bin.tab', 'sunet'));</script>
 </body>
