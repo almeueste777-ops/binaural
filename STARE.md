@@ -9,6 +9,7 @@ Depozit public: `almeueste777-ops/binaural`, branch `main`, rădăcina = site-ul
 - `guide.js` respirație, relaxare musculară, hipnoză cu voce (speechSynthesis ro-RO)
 - `cards.js` carduri cu repetiție spațiată; `journal.js` jurnal înainte/după + copie de siguranță
 - `recordings.js` 4 înregistrări cu voci reale (engleză, CC NC) redate de pe archive.org prin același mixaj; segmente `start`/`end` verificate cu Whisper
+- `recordings.js` conține și lista YT: 10 videoclipuri YouTube românești (hipnoză/meditație) în player oficial youtube-nocookie, deschise la cerere; neascultate de mine
 - `app.js` utilitare + tab-uri; `sw.js` cache offline (crește `V` la fiecare publicare)
 
 ## Ce e deschis
