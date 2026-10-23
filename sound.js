@@ -103,6 +103,34 @@ function pornesteMuzica(e, tip, destinatie) {
   e.opresteMuz = () => { clearInterval(e.timerMuz); voci.forEach(o => { try { o.stop(); } catch (_) {} }); };
 }
 
+/* ================= SUNET-CHEIE (reactivare țintită a memoriei, fără EEG) =================
+   Trei note scurte, ca o semnătură. Se asociază cu un subiect la studiu și se reia încet în somn.
+   Cercetările o fac sincronizat cu undele lente măsurate cu EEG; aici e doar după orar, deci aproximativ. */
+const CUES = { A: [784, 988, 1175], B: [659, 880, 1047], C: [587, 740, 880] };
+
+function cueLa(ctx, t, tip, vol, dest) {
+  CUES[tip].forEach((f, i) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(), s = t + i * 0.35;
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, s);
+    g.gain.linearRampToValueAtTime(vol, s + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, s + 1.2);
+    o.connect(g); g.connect(dest);
+    o.start(s); o.stop(s + 1.3);
+  });
+}
+
+// c: {tip:'A'|'B'|'C', vol, from, to, every} (secunde de la începutul ședinței)
+function pornesteCue(e, c, dest) {
+  const ctx = e.ctx;
+  let t = e.t0 + c.from;
+  const programeaza = pana => {
+    while (t < pana && t <= e.t0 + c.to) { cueLa(ctx, t, c.tip, c.vol, dest); t += c.every; }
+  };
+  programeaza(e.t0 + 90);
+  e.timerCue = setInterval(() => programeaza(ctx.currentTime + 90), 20000);
+}
+
 /* ================= MOTOR ================= */
 let eng = null;
 
@@ -212,6 +240,7 @@ async function startSound(o) {
 
   const master = ctx.createGain(); // tonuri + muzică (prin vol) și vocea merg aici, apoi la ieșire
   vol.connect(master);
+  if (o.cue) pornesteCue(e, o.cue, master);
 
   // înregistrare cu voce reală (de pe internet), trecută prin același mixaj ca tonurile
   if (o.voiceUrl) {
@@ -308,6 +337,7 @@ function stopSound(tacut) {
   const e = eng; if (!e) return;
   eng = null;
   clearInterval(e.timer);
+  clearInterval(e.timerCue);
   if (e.opresteMuz) e.opresteMuz();
   try { e.wake && e.wake.release(); } catch (_) {}
   try { e.audioEl && e.audioEl.pause(); } catch (_) {}
@@ -336,7 +366,7 @@ function deseneazaPanou() {
   $('pTitle').textContent = sel.e + ' ' + sel.nume;
   $('pDesc').textContent = sel.desc;
   const d = $('durs'); d.innerHTML = '';
-  const opt = [...new Set([10, 20, 30, 45, 60, sel.dur])].sort((a, b) => a - b);
+  const opt = [...new Set([10, 20, 30, 45, 60, ...(sel.id === 'somn' ? [90, 120] : []), sel.dur])].sort((a, b) => a - b);
   opt.forEach(m => {
     const c = document.createElement('button');
     c.className = 'chip' + (m === durMin ? ' sel' : '');
@@ -355,12 +385,23 @@ function arataStare(on) {
   $('pause').textContent = '⏸ Pauză';
 }
 
+// Somn: după primele ~30 min (când somnul profund e mai probabil) la fiecare 30 s, până cu 10 min înainte de final.
+// Alte programe: la fiecare minut, ca să se asocieze cu ce înveți.
+function planCue() {
+  const tip = $('cue').value;
+  if (tip === 'none') return null;
+  const total = durMin * 60, vol = ($('cuev').value / 100) ** 2 * 0.3;
+  if (sel.id === 'somn') return { tip, vol, from: Math.min(1800, total * 0.4), to: total - 600, every: 30 };
+  return { tip, vol, from: 60, to: total - 30, every: 60 };
+}
+
 function optiuniSunet(extra) {
   return Object.assign({
     prog: sel, min: durMin, mode: $('mode').value,
     noise: $('noise').value, noiseV: +$('noisev').value,
     vol: +$('vol').value, music: $('music').value, musicV: +$('musicv').value, file: fisierMuz,
     wake: $('wake').checked,
+    cue: planCue(),
     onTick(t, total, hz) {
       $('hzv').textContent = hz.toFixed(1);
       $('band').textContent = banda(hz);

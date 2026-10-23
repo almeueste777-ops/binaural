@@ -29,6 +29,7 @@ function urmatorul() {
   $('cplay').hidden = !curent;
   if (!curent) { deseneazaCarduri(); $('cinfo').textContent += ' · Gata pe azi 👏'; return; }
   $('cfata').textContent = curent.f;
+  cueCard();
   $('cspate').textContent = '';
   $('cshow').hidden = false; $('cans').hidden = true;
   $('crev').hidden = true;

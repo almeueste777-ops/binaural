@@ -87,6 +87,9 @@ dialog h3{margin:0 0 8px}
 .rec p{margin:4px 0 8px}
 .tag{font-size:.78rem;color:var(--acc2);margin-left:4px}
 a{color:var(--acc)}
+#luma{position:fixed;inset:0;z-index:100;opacity:0;display:flex;align-items:flex-end;justify-content:center;touch-action:manipulation}
+#luma span{color:#000;background:#fff8;padding:4px 10px;border-radius:99px;margin-bottom:24px;font-size:.8rem}
+.script{white-space:pre-wrap;font:inherit;font-size:.9rem;line-height:1.5;background:var(--card2);border-radius:12px;padding:12px;max-height:260px;overflow:auto;color:var(--txt)}
 </style>
 </head>
 <body>
@@ -145,6 +148,23 @@ a{color:var(--acc)}
 
    <label class="chk"><input type="checkbox" id="wake"> Ține ecranul aprins</label>
 
+   <details>
+    <summary>Lumină și sunet-cheie (avansat, pe răspunderea ta)</summary>
+    <label class="chk"><input type="checkbox" class="lumachk"> Lumină sincronizată cu undele (ochii închiși)</label>
+    <div class="row">
+     <select id="lumaC" style="flex:1"><option value="rosu">roșu</option><option value="ambra">chihlimbar</option><option value="albastru">albastru</option><option value="alb">alb</option></select>
+    </div>
+    <label for="lumaI">Intensitate lumină</label>
+    <input type="range" id="lumaI" min="5" max="100" value="35">
+    <p class="mic">Ecranul pulsează în ritmul undelor (până la 30 Hz). Ține telefonul în fața ochilor închiși, într-o cameră întunecată. Atinge ecranul ca să oprești. Primul start cere o confirmare.</p>
+
+    <label for="cue">Sunet-cheie pentru memorie</label>
+    <select id="cue"><option value="none">Fără</option><option value="A">Sunet A (sol–si–re)</option><option value="B">Sunet B (mi–la–do)</option><option value="C">Sunet C (re–fa♯–la)</option></select>
+    <label for="cuev">Volum sunet-cheie</label>
+    <input type="range" id="cuev" min="1" max="100" value="25">
+    <p class="mic">Alege un sunet pentru un subiect: îl auzi la fiecare minut cât înveți (program de învățare) sau la fiecare card, iar în programul Somn (alege 90 sau 120 min) se repetă încet după primele ~30 de minute. În laborator se face sincronizat cu EEG, la unde lente; aici e după orar, deci mai puțin precis, și poate trezi dacă e prea tare. Dovezile sunt modeste.</p>
+   </details>
+
    <button class="big" id="go">▶ Începe</button>
    <div class="status" id="status">
     <div class="hz"><span id="hzv">0</span> Hz</div>
@@ -201,6 +221,7 @@ a{color:var(--acc)}
    <p class="mic" id="gnota" hidden>Telefonul nu are voce românească. iPhone: Setări → Accesibilitate → Conținut rostit → Voci → Română. Android: Setări → Gestionare generală → Sinteză vocală. Până atunci vezi textul pe ecran.</p>
    <div id="gfondbox">
     <label class="chk"><input type="checkbox" id="gfond" checked> Cu unde binaurale în fundal (căști)</label>
+   <label class="chk"><input type="checkbox" class="lumachk"> Lumină sincronizată (setări în tabul Sunet)</label>
     <label for="gvol">Volum fundal</label>
     <input type="range" id="gvol" min="0" max="100" value="22">
    </div>
@@ -252,6 +273,34 @@ a{color:var(--acc)}
    </div>
    <p class="mic">Nu le asculta la volan. Sesiunile de somn te lasă să adormi; cele de relaxare te trezesc cu numărătoare. Sugestiile din ele sunt ale autorilor: dacă nu înțelegi engleza, nu le folosi.</p>
   </section>
+
+  <section class="panel">
+   <h2>🎤 Vocea ta</h2>
+   <p>Înregistrează-te citind un text (sau liber) și redă-l apoi cu unde binaurale dedesubt. Înregistrarea rămâne doar pe telefonul tău. Prima dată, telefonul îți cere voie să folosești microfonul.</p>
+   <label for="vtext">Text de citit</label>
+   <select id="vtext">
+    <option value="hip-trezire">Hipnoză (cu sugestiile mele) — cu trezire</option>
+    <option value="hip-somn">Hipnoză (cu sugestiile mele) — pentru somn</option>
+    <option value="pmr">Relaxare musculară progresivă</option>
+    <option value="liber">Fără text (liber)</option>
+   </select>
+   <pre id="vscript" class="script"></pre>
+   <p class="mic">Citește rar, cu voce joasă, și respectă pauzele (numără în gând). Sugestiile tale se iau din caseta din secțiunea Ghid, de mai sus.</p>
+   <button class="big" id="vrec">● Înregistrează</button>
+   <div class="time" id="vtimp" style="text-align:center;margin-top:6px"></div>
+   <div id="vprev" hidden>
+    <audio id="vaudio" controls style="width:100%;margin-top:10px"></audio>
+    <label for="vnume">Nume</label>
+    <input type="text" id="vnume">
+    <div class="row" style="margin-top:10px">
+     <button class="small no" id="vcancel" style="flex:1">Șterge</button>
+     <button class="small ok" id="vsave" style="flex:1">Salvează</button>
+    </div>
+   </div>
+   <h2 style="margin-top:16px">Înregistrările tale</h2>
+   <div id="vlist"></div>
+   <div id="vplayer" class="rec" hidden></div>
+  </section>
  </section>
 
  <!-- ================= CARDURI ================= -->
@@ -260,6 +309,8 @@ a{color:var(--acc)}
   <section class="panel">
    <h2>Repetă</h2>
    <p id="cinfo"></p>
+   <label for="ccue">Sunet-cheie la fiecare card (se alege volumul în Sunet → avansat)</label>
+   <select id="ccue"><option value="none">Fără</option><option value="A">Sunet A</option><option value="B">Sunet B</option><option value="C">Sunet C</option></select>
    <button class="big" id="crev" style="margin-top:0">▶ Repetă cardurile de azi</button>
    <div id="cplay" hidden>
     <div class="card"><div id="cfata"></div><div class="s" id="cspate"></div></div>
@@ -310,6 +361,16 @@ a{color:var(--acc)}
  <button data-tab="jurnal"><span>📓</span>Jurnal</button>
 </nav>
 
+<dialog id="lumaDlg">
+ <h3>⚠ Lumină pulsatorie</h3>
+ <p style="font-size:.92rem">Lumina care pâlpâie între ~1 și 30 de ori pe secundă poate provoca <b>crize la persoanele cu epilepsie fotosensibilă</b>, migrene sau amețeli, uneori la oameni care nu știau că au această sensibilitate. Folosește-o doar cu <b>ochii închiși</b>, <b>nu la volan</b> și nu în preajma altor persoane care nu au fost avertizate. Dacă simți greață, amețeală, dureri de cap sau orice disconfort, <b>atinge ecranul ca să oprești</b> lumina și odihnește-te.</p>
+ <label class="chk"><input type="checkbox" id="lumaOk"> Am înțeles riscurile și îmi asum răspunderea pentru folosirea ei.</label>
+ <div class="row" style="margin-top:14px">
+  <button class="small" id="lumaNo" style="flex:1">Renunț</button>
+  <button class="small ok" id="lumaYes" style="flex:1" disabled>Pornesc lumina</button>
+ </div>
+</dialog>
+
 <dialog id="rate">
  <h3 id="rateTitle"></h3>
  <label for="rf">Concentrare: <b id="rfv">5</b> / 10</label>
@@ -329,6 +390,7 @@ a{color:var(--acc)}
 <script src="guide.js"></script>
 <script src="recordings.js"></script>
 <script src="cards.js"></script>
+<script src="extras.js"></script>
 <script>arataTab(citeste('bin.tab', 'sunet'));</script>
 </body>
 </html>
