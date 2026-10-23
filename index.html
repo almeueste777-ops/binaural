@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1226">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Binaural">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>Unde Binaurale</title>
+<style>
+:root{--bg:#0f1226;--card:#1a1e3b;--card2:#232850;--txt:#e9ebff;--dim:#9aa0cc;--acc:#7c8cff;--acc2:#5eead4;--warn:#fbbf24}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+ padding:env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px)}
+main{max-width:640px;margin:0 auto}
+h1{font-size:1.5rem;margin:20px 0 4px}
+.sub{color:var(--dim);margin:0 0 16px;font-size:.95rem}
+.warn{background:#2a2540;border:1px solid #4b4270;border-radius:12px;padding:10px 14px;font-size:.88rem;color:#e7dcb0;margin-bottom:16px}
+.warn b{color:var(--warn)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.prog{background:var(--card);border:2px solid transparent;border-radius:14px;padding:12px;text-align:left;color:var(--txt);font:inherit;cursor:pointer}
+.prog .e{font-size:1.6rem;display:block}
+.prog b{display:block;margin-top:2px}
+.prog small{color:var(--dim);display:block;line-height:1.3;margin-top:2px}
+.prog.sel{border-color:var(--acc);background:var(--card2)}
+.panel{background:var(--card);border-radius:16px;padding:16px;margin-top:16px}
+.panel h2{margin:0 0 4px;font-size:1.15rem}
+.panel p{margin:4px 0 12px;color:var(--dim);font-size:.92rem}
+label{display:block;margin:12px 0 4px;font-size:.9rem;color:var(--dim)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+select{width:100%;background:var(--card2);color:var(--txt);border:1px solid #3a4080;border-radius:10px;padding:10px;font:inherit}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:56px;background:var(--card2);color:var(--txt);border:2px solid transparent;border-radius:10px;padding:8px;font:inherit;cursor:pointer}
+.chip.sel{border-color:var(--acc2)}
+.chk{display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--txt);font-size:.92rem}
+.chk input{width:20px;height:20px;accent-color:var(--acc)}
+.big{width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;font:inherit;font-weight:700;font-size:1.1rem;
+ background:linear-gradient(135deg,var(--acc),var(--acc2));color:#0b0d20;cursor:pointer}
+.big.stop{background:#3a2a4a;color:var(--txt)}
+.status{text-align:center;margin-top:14px;display:none}
+.status.on{display:block}
+.hz{font-size:2.4rem;font-weight:700;color:var(--acc2);font-variant-numeric:tabular-nums}
+.band{color:var(--dim)}
+.bar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.time{color:var(--dim);font-size:.85rem;font-variant-numeric:tabular-nums}
+.pause{background:none;border:1px solid #4a5090;color:var(--txt);border-radius:10px;padding:8px 18px;font:inherit;margin-top:10px;cursor:pointer}
+details{margin-top:16px;color:var(--dim);font-size:.9rem}
+summary{cursor:pointer;color:var(--txt)}
+details p{margin:8px 0}
+</style>
+</head>
+<body>
+<main>
+ <h1>🎧 Unde Binaurale</h1>
+ <p class="sub">Programe de sunet pentru concentrare, memorare, relaxare, meditație și somn.</p>
+
+ <div class="warn">
+  <b>Pune căștile</b> (stereo, orice fel) — undele binaurale NU funcționează pe difuzor.
+  <b>Nu le folosi la volan</b>, pe bicicletă sau lângă utilaje. Ține volumul mic.
+  Nu e tratament medical; dacă ai epilepsie sau un stimulator cardiac, întreabă întâi medicul.
+ </div>
+
+ <div class="grid" id="grid"></div>
+
+ <section class="panel">
+  <h2 id="pTitle"></h2>
+  <p id="pDesc"></p>
+
+  <label>Durată</label>
+  <div class="row" id="durs"></div>
+
+  <label for="vol">Volum: <span id="volv"></span></label>
+  <input type="range" id="vol" min="0" max="100" value="35">
+
+  <label for="noise">Sunet de fundal (face ascultarea mai plăcută)</label>
+  <select id="noise">
+   <option value="none">Fără</option>
+   <option value="brown" selected>Zgomot maroniu (adânc, ca o cascadă îndepărtată)</option>
+   <option value="pink">Zgomot roz (ca ploaia)</option>
+  </select>
+  <label for="noisev">Volum fundal</label>
+  <input type="range" id="noisev" min="0" max="100" value="50">
+
+  <label for="mode">Tip de ton</label>
+  <select id="mode">
+   <option value="bin" selected>Binaural (cu căști)</option>
+   <option value="iso">Izocronic (merge și fără căști, efect mai slab)</option>
+  </select>
+
+  <label class="chk"><input type="checkbox" id="wake"> Ține ecranul aprins</label>
+
+  <button class="big" id="go">▶ Începe</button>
+
+  <div class="status" id="status">
+   <div class="hz"><span id="hzv">0</span> Hz</div>
+   <div class="band" id="band"></div>
+   <div class="bar"><i id="barfill"></i></div>
+   <div class="time" id="time"></div>
+   <button class="pause" id="pause">⏸ Pauză</button>
+  </div>
+ </section>
+
+ <details>
+  <summary>Cum funcționează și ce poți aștepta</summary>
+  <p>Într-o ureche auzi un ton, în cealaltă unul puțin diferit (ex. 195 Hz și 205 Hz). Creierul „aude” diferența (10 Hz) ca pe o bătaie lentă. Ideea: activitatea creierului tinde să se apropie de acel ritm.</p>
+  <p><b>Delta</b> 0,5–4 Hz somn adânc · <b>Theta</b> 4–8 Hz reverie, meditație · <b>Alpha</b> 8–13 Hz calm treaz · <b>Beta</b> 13–30 Hz concentrare · <b>Gamma</b> 30+ Hz atenție înaltă.</p>
+  <p>Sincer: dovezile științifice sunt <b>mixte și modeste</b>. Unele studii arată un efect mic asupra atenției, anxietății și somnului; altele nu găsesc nimic. Nu te face genial și nu „încarcă” memoria direct. Ajută cel mai mult ca <b>ritual</b>: același sunet, același loc, aceeași oră — creierul învață să intre mai repede în starea dorită. „Transa” de aici înseamnă stare meditativă profundă, nu pierderea controlului.</p>
+  <p>Încearcă fiecare program 1–2 săptămâni și notează cum te simți. Dacă ceva te amețește sau te enervează, oprește.</p>
+ </details>
+ <details>
+  <summary>Instalare pe telefon</summary>
+  <p><b>iPhone:</b> deschide linkul în Safari → butonul Partajare (pătrat cu săgeată în sus) → „Adaugă pe ecranul de pornire”.</p>
+  <p><b>Android:</b> deschide în Chrome → meniul ⋮ → „Instalează aplicația”.</p>
+  <p>După prima deschidere cu internet, merge și fără internet. Pe iPhone, ca sunetul să continue cu ecranul stins, pornește-l cu „Ține ecranul aprins” bifat sau lasă ecranul pornit și dim.</p>
+ </details>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
