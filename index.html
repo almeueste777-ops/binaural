@@ -13,10 +13,11 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <title>Unde Binaurale</title>
 <style>
-:root{--bg:#0f1226;--card:#1a1e3b;--card2:#232850;--txt:#e9ebff;--dim:#9aa0cc;--acc:#7c8cff;--acc2:#5eead4;--warn:#fbbf24}
+:root{--bg:#0f1226;--card:#1a1e3b;--card2:#232850;--txt:#e9ebff;--dim:#9aa0cc;--acc:#7c8cff;--acc2:#5eead4;--warn:#fbbf24;--bad:#fb7185}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
- padding:env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 24px)}
+ padding:env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 84px)}
 main{max-width:640px;margin:0 auto}
 h1{font-size:1.5rem;margin:20px 0 4px}
 .sub{color:var(--dim);margin:0 0 16px;font-size:.95rem}
@@ -31,9 +32,11 @@ h1{font-size:1.5rem;margin:20px 0 4px}
 .panel{background:var(--card);border-radius:16px;padding:16px;margin-top:16px}
 .panel h2{margin:0 0 4px;font-size:1.15rem}
 .panel p{margin:4px 0 12px;color:var(--dim);font-size:.92rem}
+.mic{font-size:.8rem!important}
 label{display:block;margin:12px 0 4px;font-size:.9rem;color:var(--dim)}
 input[type=range]{width:100%;accent-color:var(--acc)}
-select{width:100%;background:var(--card2);color:var(--txt);border:1px solid #3a4080;border-radius:10px;padding:10px;font:inherit}
+select,input[type=text],textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid #3a4080;border-radius:10px;padding:10px;font:inherit}
+textarea{resize:vertical}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .chip{flex:1;min-width:56px;background:var(--card2);color:var(--txt);border:2px solid transparent;border-radius:10px;padding:8px;font:inherit;cursor:pointer}
 .chip.sel{border-color:var(--acc2)}
@@ -42,6 +45,9 @@ select{width:100%;background:var(--card2);color:var(--txt);border:1px solid #3a4
 .big{width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;font:inherit;font-weight:700;font-size:1.1rem;
  background:linear-gradient(135deg,var(--acc),var(--acc2));color:#0b0d20;cursor:pointer}
 .big.stop{background:#3a2a4a;color:var(--txt)}
+.small{padding:10px 16px;border:0;border-radius:10px;font:inherit;font-weight:600;cursor:pointer;background:var(--card2);color:var(--txt)}
+.small.ok{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#0b0d20}
+.small.no{background:#4a2a3a}
 .status{text-align:center;margin-top:14px;display:none}
 .status.on{display:block}
 .hz{font-size:2.4rem;font-weight:700;color:var(--acc2);font-variant-numeric:tabular-nums}
@@ -53,73 +59,232 @@ select{width:100%;background:var(--card2);color:var(--txt);border:1px solid #3a4
 details{margin-top:16px;color:var(--dim);font-size:.9rem}
 summary{cursor:pointer;color:var(--txt)}
 details p{margin:8px 0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#12163300;background:#121633;border-top:1px solid #2a2f5e;
+ padding:6px 8px calc(env(safe-area-inset-bottom) + 6px);gap:4px;z-index:5}
+nav button{flex:1;background:none;border:0;color:var(--dim);font:inherit;font-size:.72rem;padding:6px 2px;border-radius:10px;cursor:pointer}
+nav button span{display:block;font-size:1.3rem;line-height:1.1}
+nav button.sel{color:var(--acc2);background:var(--card)}
+/* ghid */
+.stage{text-align:center;margin-top:12px}
+.circ{width:200px;height:200px;margin:8px auto;display:flex;align-items:center;justify-content:center}
+.circ div{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--acc2),var(--acc) 70%);
+ transform:scale(.45);opacity:.9;box-shadow:0 0 40px #5eead455}
+.line{font-size:1.25rem;line-height:1.45;min-height:5.5em;padding:0 4px}
+.sec{font-size:1.4rem;color:var(--acc2);min-height:1.8em}
+/* carduri, jurnal */
+.card{background:var(--card2);border-radius:14px;padding:20px;text-align:center;font-size:1.3rem;min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.card .s{color:var(--acc2)}
+ul.l{list-style:none;padding:0;margin:8px 0;font-size:.88rem;color:var(--dim)}
+ul.l li{padding:6px 0;border-bottom:1px solid #2a2f5e;display:flex;justify-content:space-between;gap:8px}
+ul.l button{background:none;border:0;color:var(--bad);font-size:1rem;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:6px 4px;text-align:left;border-bottom:1px solid #2a2f5e}
+.pos{color:var(--acc2)}.neg{color:var(--bad)}
+dialog{background:var(--card);color:var(--txt);border:1px solid #3a4080;border-radius:16px;padding:20px;width:min(92vw,420px)}
+dialog::backdrop{background:#000a}
+dialog h3{margin:0 0 8px}
 </style>
 </head>
 <body>
 <main>
  <h1>🎧 Unde Binaurale</h1>
- <p class="sub">Programe de sunet pentru concentrare, memorare, relaxare, meditație și somn.</p>
 
- <div class="warn">
-  <b>Pune căștile</b> (stereo, orice fel) — undele binaurale NU funcționează pe difuzor.
-  <b>Nu le folosi la volan</b>, pe bicicletă sau lângă utilaje. Ține volumul mic.
-  Nu e tratament medical; dacă ai epilepsie sau un stimulator cardiac, întreabă întâi medicul.
- </div>
-
- <div class="grid" id="grid"></div>
-
- <section class="panel">
-  <h2 id="pTitle"></h2>
-  <p id="pDesc"></p>
-
-  <label>Durată</label>
-  <div class="row" id="durs"></div>
-
-  <label for="vol">Volum: <span id="volv"></span></label>
-  <input type="range" id="vol" min="0" max="100" value="35">
-
-  <label for="noise">Sunet de fundal (face ascultarea mai plăcută)</label>
-  <select id="noise">
-   <option value="none">Fără</option>
-   <option value="brown" selected>Zgomot maroniu (adânc, ca o cascadă îndepărtată)</option>
-   <option value="pink">Zgomot roz (ca ploaia)</option>
-  </select>
-  <label for="noisev">Volum fundal</label>
-  <input type="range" id="noisev" min="0" max="100" value="50">
-
-  <label for="mode">Tip de ton</label>
-  <select id="mode">
-   <option value="bin" selected>Binaural (cu căști)</option>
-   <option value="iso">Izocronic (merge și fără căști, efect mai slab)</option>
-  </select>
-
-  <label class="chk"><input type="checkbox" id="wake"> Ține ecranul aprins</label>
-
-  <button class="big" id="go">▶ Începe</button>
-
-  <div class="status" id="status">
-   <div class="hz"><span id="hzv">0</span> Hz</div>
-   <div class="band" id="band"></div>
-   <div class="bar"><i id="barfill"></i></div>
-   <div class="time" id="time"></div>
-   <button class="pause" id="pause">⏸ Pauză</button>
+ <!-- ================= SUNET ================= -->
+ <section class="tab" id="tab-sunet">
+  <p class="sub">Programe de sunet pentru concentrare, memorare, relaxare, meditație și somn.</p>
+  <div class="warn">
+   <b>Pune căștile</b> (stereo, orice fel) — undele binaurale NU funcționează pe difuzor.
+   <b>Nu le folosi la volan</b>, pe bicicletă sau lângă utilaje. Ține volumul mic.
+   Nu e tratament medical; dacă ai epilepsie sau un stimulator cardiac, întreabă întâi medicul.
   </div>
+  <div class="grid" id="grid"></div>
+  <section class="panel">
+   <h2 id="pTitle"></h2>
+   <p id="pDesc"></p>
+
+   <label>Durată</label>
+   <div class="row" id="durs"></div>
+
+   <label for="vol">Volum tonuri: <span id="volv"></span></label>
+   <input type="range" id="vol" min="0" max="100" value="35">
+
+   <label for="music">Muzică</label>
+   <select id="music">
+    <option value="none">Fără muzică</option>
+    <option value="calm">Ambient generat — calm (la minor)</option>
+    <option value="luminos">Ambient generat — luminos (re lidian)</option>
+    <option value="adanc">Ambient generat — adânc (dronă)</option>
+    <option value="file">Muzica mea (fișier de pe telefon)</option>
+   </select>
+   <div id="filebox" hidden>
+    <label for="file">Alege un fișier audio (rămâne pe telefonul tău)</label>
+    <input type="file" id="file" accept="audio/*">
+    <p class="mic" id="fname">niciun fișier ales</p>
+   </div>
+   <label for="musicv">Volum muzică</label>
+   <input type="range" id="musicv" min="0" max="100" value="55">
+
+   <label for="noise">Sunet de fundal</label>
+   <select id="noise">
+    <option value="none">Fără</option>
+    <option value="brown">Zgomot maroniu (adânc, ca o cascadă îndepărtată)</option>
+    <option value="pink">Zgomot roz (ca ploaia)</option>
+   </select>
+   <label for="noisev">Volum fundal</label>
+   <input type="range" id="noisev" min="0" max="100" value="40">
+
+   <label for="mode">Tip de ton</label>
+   <select id="mode">
+    <option value="bin" selected>Binaural (cu căști)</option>
+    <option value="iso">Izocronic (merge și fără căști, efect mai slab)</option>
+   </select>
+
+   <label class="chk"><input type="checkbox" id="wake"> Ține ecranul aprins</label>
+
+   <button class="big" id="go">▶ Începe</button>
+   <div class="status" id="status">
+    <div class="hz"><span id="hzv">0</span> Hz</div>
+    <div class="band" id="band"></div>
+    <div class="bar"><i id="barfill"></i></div>
+    <div class="time" id="time"></div>
+    <button class="pause" id="pause">⏸ Pauză</button>
+   </div>
+  </section>
+
+  <details>
+   <summary>Cum funcționează și ce poți aștepta</summary>
+   <p>Într-o ureche auzi un ton, în cealaltă unul puțin diferit (ex. 195 Hz și 205 Hz). Creierul „aude” diferența (10 Hz) ca pe o bătaie lentă. Ideea: activitatea creierului tinde să se apropie de acel ritm.</p>
+   <p><b>Delta</b> 0,5–4 Hz somn adânc · <b>Theta</b> 4–8 Hz reverie, meditație · <b>Alpha</b> 8–13 Hz calm treaz · <b>Beta</b> 13–30 Hz concentrare · <b>Gamma</b> 30+ Hz atenție înaltă.</p>
+   <p>Sincer: dovezile științifice sunt <b>mixte și modeste</b>. Unele studii arată un efect mic asupra atenției, anxietății și somnului; altele nu găsesc nimic. Nu te face genial și nu „încarcă” memoria direct. Ajută cel mai mult ca <b>ritual</b>: același sunet, același loc, aceeași oră. „Transa” de aici înseamnă stare meditativă profundă, nu pierderea controlului. Jurnalul îți arată dacă ajută pe tine.</p>
+  </details>
+  <details>
+   <summary>Instalare pe telefon</summary>
+   <p><b>iPhone:</b> deschide linkul în Safari → butonul Partajare (pătrat cu săgeată în sus) → „Adaugă pe ecranul de pornire”.</p>
+   <p><b>Android:</b> deschide în Chrome → meniul ⋮ → „Instalează aplicația”.</p>
+   <p>După prima deschidere cu internet, merge și fără internet. Pentru ca sunetul să continue cu ecranul stins, pornește ședința și blochează telefonul; dacă se oprește, bifează „Ține ecranul aprins”.</p>
+  </details>
  </section>
 
- <details>
-  <summary>Cum funcționează și ce poți aștepta</summary>
-  <p>Într-o ureche auzi un ton, în cealaltă unul puțin diferit (ex. 195 Hz și 205 Hz). Creierul „aude” diferența (10 Hz) ca pe o bătaie lentă. Ideea: activitatea creierului tinde să se apropie de acel ritm.</p>
-  <p><b>Delta</b> 0,5–4 Hz somn adânc · <b>Theta</b> 4–8 Hz reverie, meditație · <b>Alpha</b> 8–13 Hz calm treaz · <b>Beta</b> 13–30 Hz concentrare · <b>Gamma</b> 30+ Hz atenție înaltă.</p>
-  <p>Sincer: dovezile științifice sunt <b>mixte și modeste</b>. Unele studii arată un efect mic asupra atenției, anxietății și somnului; altele nu găsesc nimic. Nu te face genial și nu „încarcă” memoria direct. Ajută cel mai mult ca <b>ritual</b>: același sunet, același loc, aceeași oră — creierul învață să intre mai repede în starea dorită. „Transa” de aici înseamnă stare meditativă profundă, nu pierderea controlului.</p>
-  <p>Încearcă fiecare program 1–2 săptămâni și notează cum te simți. Dacă ceva te amețește sau te enervează, oprește.</p>
- </details>
- <details>
-  <summary>Instalare pe telefon</summary>
-  <p><b>iPhone:</b> deschide linkul în Safari → butonul Partajare (pătrat cu săgeată în sus) → „Adaugă pe ecranul de pornire”.</p>
-  <p><b>Android:</b> deschide în Chrome → meniul ⋮ → „Instalează aplicația”.</p>
-  <p>După prima deschidere cu internet, merge și fără internet. Pe iPhone, ca sunetul să continue cu ecranul stins, pornește-l cu „Ține ecranul aprins” bifat sau lasă ecranul pornit și dim.</p>
- </details>
+ <!-- ================= GHID ================= -->
+ <section class="tab" id="tab-ghid" hidden>
+  <p class="sub">Respirație, relaxare musculară și ședințe de hipnoză vorbite, în română.</p>
+  <section class="panel">
+   <label for="gtip" style="margin-top:0">Ce vrei să faci?</label>
+   <select id="gtip">
+    <option value="coer">🌬 Respirație coerentă (5,5/min)</option>
+    <option value="r478">🌬 Respirație 4-7-8</option>
+    <option value="box">🌬 Respirație pătrată</option>
+    <option value="pmr">💆 Relaxare musculară progresivă</option>
+    <option value="hip">🌀 Ședință de hipnoză</option>
+   </select>
+   <p id="gdesc"></p>
+
+   <div id="gminbox">
+    <label for="gmin">Durată</label>
+    <select id="gmin"><option value="3">3 minute</option><option value="5" selected>5 minute</option><option value="10">10 minute</option><option value="15">15 minute</option><option value="20">20 minute</option></select>
+   </div>
+
+   <div id="ghipbox" hidden>
+    <label for="sug">Sugestiile tale (câte una pe rând, la persoana a doua, pozitive, în prezent)</label>
+    <textarea id="sug" rows="4" placeholder="Ești calm și concentrat când înveți.&#10;Îți amintești cu ușurință ce ai citit."></textarea>
+    <label for="gfinal">La sfârșit</label>
+    <select id="gfinal"><option value="trezire">Trezire (număr de la 1 la 5)</option><option value="somn">Somn (te lasă să adormi)</option></select>
+    <p class="mic">Nu folosi hipnoza la volan sau când trebuie să fii atent. Nu te poate face să faci ceva împotriva voinței tale, iar te poți opri oricând cu „Oprește”. Dacă ai o afecțiune psihică gravă, vorbește întâi cu medicul.</p>
+   </div>
+
+   <label class="chk"><input type="checkbox" id="gvoce" checked> Voce (citește cu glas tare)</label>
+   <p class="mic" id="gnota" hidden>Telefonul nu are voce românească. iPhone: Setări → Accesibilitate → Conținut rostit → Voci → Română. Android: Setări → Gestionare generală → Sinteză vocală. Până atunci vezi textul pe ecran.</p>
+   <div id="gfondbox">
+    <label class="chk"><input type="checkbox" id="gfond" checked> Cu unde binaurale în fundal (căști)</label>
+    <label for="gvol">Volum fundal</label>
+    <input type="range" id="gvol" min="0" max="100" value="22">
+   </div>
+
+   <button class="big" id="ggo">▶ Începe</button>
+
+   <div class="stage" id="gstage" hidden>
+    <div class="circ" id="gcerc"><div id="cerc"></div></div>
+    <div class="sec" id="gsub"></div>
+    <div class="line" id="gtext"></div>
+    <div class="bar"><i id="gprog"></i></div>
+   </div>
+  </section>
+ </section>
+
+ <!-- ================= CARDURI ================= -->
+ <section class="tab" id="tab-carduri" hidden>
+  <p class="sub">Repetiția spațiată e cea mai bine dovedită metodă de a reține: fiecare card revine la 1, 3, 7, 21, 45 de zile dacă îl știi.</p>
+  <section class="panel">
+   <h2>Repetă</h2>
+   <p id="cinfo"></p>
+   <button class="big" id="crev" style="margin-top:0">▶ Repetă cardurile de azi</button>
+   <div id="cplay" hidden>
+    <div class="card"><div id="cfata"></div><div class="s" id="cspate"></div></div>
+    <div class="row" style="margin-top:10px">
+     <button class="small" id="cshow" style="flex:1">Arată răspunsul</button>
+    </div>
+    <div class="row" id="cans" style="margin-top:10px" hidden>
+     <button class="small no" id="cno" style="flex:1">Nu știam</button>
+     <button class="small ok" id="cyes" style="flex:1">Știam</button>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="small" id="cstop" style="flex:1">Oprește</button></div>
+   </div>
+  </section>
+  <section class="panel">
+   <h2>Card nou</h2>
+   <label for="cf">Față (întrebarea)</label>
+   <input type="text" id="cf" autocomplete="off">
+   <label for="cb">Spate (răspunsul)</label>
+   <input type="text" id="cb" autocomplete="off">
+   <button class="big" id="cadd" style="margin-top:12px">＋ Adaugă</button>
+   <ul class="l" id="clist"></ul>
+  </section>
+ </section>
+
+ <!-- ================= JURNAL ================= -->
+ <section class="tab" id="tab-jurnal" hidden>
+  <p class="sub">Vezi dacă programele chiar te ajută pe tine, nu doar pe hârtie.</p>
+  <section class="panel">
+   <label class="chk" style="margin-top:0"><input type="checkbox" id="jon" checked> Întreabă-mă înainte și după fiecare ședință</label>
+   <h2 style="margin-top:14px">Ce te ajută</h2>
+   <div id="jstat"></div>
+   <h2 style="margin-top:14px">Ultimele ședințe</h2>
+   <ul class="l" id="jlist"></ul>
+  </section>
+  <details>
+   <summary>Copie de siguranță (jurnal, carduri, sugestii)</summary>
+   <p>Datele stau doar pe acest telefon. Dacă schimbi telefonul sau ștergi aplicația, le pierzi. Apasă „Arată copia”, copiază tot textul și trimite-l ție (mesaj, notițe). Ca să restaurezi, lipește textul aici și apasă „Restaurează”.</p>
+   <textarea id="bkText" rows="4"></textarea>
+   <div class="row" style="margin-top:8px"><button class="small" id="bkShow">Arată copia</button><button class="small" id="bkLoad">Restaurează</button></div>
+  </details>
+ </section>
 </main>
+
+<nav>
+ <button data-tab="sunet" class="sel"><span>🎧</span>Sunet</button>
+ <button data-tab="ghid"><span>🌬</span>Ghid</button>
+ <button data-tab="carduri"><span>🃏</span>Carduri</button>
+ <button data-tab="jurnal"><span>📓</span>Jurnal</button>
+</nav>
+
+<dialog id="rate">
+ <h3 id="rateTitle"></h3>
+ <label for="rf">Concentrare: <b id="rfv">5</b> / 10</label>
+ <input type="range" id="rf" min="1" max="10" value="5">
+ <label for="rc">Calm: <b id="rcv">5</b> / 10</label>
+ <input type="range" id="rc" min="1" max="10" value="5">
+ <div class="row" style="margin-top:16px">
+  <button class="small" id="rateCancel">Anulează</button>
+  <button class="small" id="rateSkip">Sari</button>
+  <button class="small ok" id="rateOk" style="flex:1">Salvează</button>
+ </div>
+</dialog>
+
 <script src="app.js"></script>
+<script src="journal.js"></script>
+<script src="sound.js"></script>
+<script src="guide.js"></script>
+<script src="cards.js"></script>
+<script>arataTab(citeste('bin.tab', 'sunet'));</script>
 </body>
 </html>
