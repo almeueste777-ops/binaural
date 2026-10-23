@@ -1,4 +1,4 @@
-const V = 'binaural-v3';
+const V = 'binaural-v4';
 const FISIERE = ['./', 'index.html', 'app.js', 'journal.js', 'sound.js', 'guide.js', 'recordings.js', 'cards.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-180.png'];
 
 self.addEventListener('install', e => {
