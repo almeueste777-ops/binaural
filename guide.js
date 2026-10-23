@@ -51,24 +51,29 @@ function spune(text, vol) {
 /* ---------- scripturi ---------- */
 function scriptRelaxare() {
   const s = [];
-  const add = (t, p) => s.push({ t, p });
+  let B = 10;
+  const add = (t, p) => s.push({ t, p, b: B });
   add('Întinde-te sau stai comod. Vom încorda pe rând grupe de mușchi, vom ține câteva secunde, apoi vom lăsa totul să se relaxeze. Încordează doar cât simți, fără durere.', 6);
   const grupe = ['Pumnii și antebrațele: strânge pumnii', 'Brațele: îndoaie coatele și încordează mușchii', 'Fruntea: ridică sprâncenele',
     'Ochii și obrajii: strânge ușor ochii', 'Maxilarul: apasă ușor dinții', 'Umerii: ridică-i spre urechi',
     'Pieptul și spatele: trage omoplații înapoi', 'Abdomenul: strânge-l', 'Coapsele și fesele: strânge-le',
     'Pulpele: trage degetele de la picioare spre tine', 'Tălpile: strânge degetele de la picioare'];
-  grupe.forEach(g => {
+  grupe.forEach((g, i) => {
+    B = 10 - i * 0.15; // alpha care coboară lent pe parcursul relaxării
     add(g + '. Inspiră și încordează... ține.', 5);
     add('Și acum expiră, și relaxează complet. Simte diferența, căldura, greutatea.', 10);
   });
+  B = 8;
   add('Observă tot corpul, greu și relaxat. Rămâi așa câteva respirații.', 20);
+  B = 11;
   add('Când ești gata, mișcă ușor degetele și deschide ochii.', 3);
   return s;
 }
 
 function scriptHipnoza(min, final) {
   const s = [];
-  const add = (t, p) => s.push({ t, p: Math.round(p * m * 10) / 10 });
+  let B = 10; // frecvența de bătaie (Hz) a fazei curente; undele urmăresc ședința
+  const add = (t, p) => s.push({ t, p: Math.round(p * m * 10) / 10, b: B });
   const m = Math.min(1.5, Math.max(0.5, min / 10));
   add('Așază-te sau întinde-te într-o poziție comodă. Nu ai nimic de făcut și nimic de rezolvat acum.', 6);
   add('Lasă ochii să se închidă. Fă o respirație mai adâncă, pe nas, și lasă aerul să iasă încet, pe gură.', 8);
@@ -76,10 +81,13 @@ function scriptHipnoza(min, final) {
   add('Doar observă respirația, exact așa cum este. Nu trebuie să o schimbi.', 10);
   const corp = ['fruntea', 'ochii și obrajii', 'maxilarul', 'gâtul și umerii', 'brațele și mâinile', 'pieptul', 'abdomenul', 'spatele', 'șoldurile', 'picioarele'];
   const k = min <= 5 ? 5 : min <= 10 ? 8 : 10;
-  corp.slice(0, k).forEach(p => add(`Adu atenția la ${p}. Observă ce simți acolo și lasă să se înmoaie, să devină mai greu, mai cald, mai relaxat.`, 7));
+  corp.slice(0, k).forEach((p, i) => { B = 9 - i * 0.12; add(`Adu atenția la ${p}. Observă ce simți acolo și lasă să se înmoaie, să devină mai greu, mai cald, mai relaxat.`, 7); });
+  B = 8;
   add('Acum imaginează-ți o scară cu zece trepte, care coboară încet. Voi număra înapoi, și cu fiecare număr te vei relaxa mai profund.', 6);
-  for (let n = 10; n >= 1; n--) add(n > 1 ? `${NUMERE[n]}. Cobori o treaptă și te relaxezi mai profund.` : 'Unu. Ai ajuns jos, într-o liniște adâncă.', 6);
+  for (let n = 10; n >= 1; n--) { B = 8 - (10 - n) * 0.25; add(n > 1 ? `${NUMERE[n]}. Cobori o treaptă și te relaxezi mai profund.` : 'Unu. Ai ajuns jos, într-o liniște adâncă.', 6); }
+  B = 6;
   add('Imaginează-ți acum un loc în care te simți complet în siguranță și liniștit. Poate fi real sau inventat. Observă ce vezi, ce auzi, ce miros are, și cât de confortabil este corpul tău acolo.', 20);
+  B = 5.5; // theta joasă: starea cea mai receptivă pentru sugestii
   add('Din acest loc liniștit, mintea ta este deschisă și receptivă. Voi spune câteva idei, iar tu le primești cu blândețe.', 5);
   let sug = $('sug').value.split('\n').map(x => x.trim()).filter(Boolean);
   if (!sug.length) sug = ['Ești calm și în siguranță.', 'Mintea ta este limpede și atentă.', 'Fiecare zi te găsește puțin mai încrezător.'];
@@ -88,16 +96,20 @@ function scriptHipnoza(min, final) {
   sug.forEach(x => add(x, 8));
   add('Rămâi aici cât vrei, în liniște.', 25);
   if (final === 'somn') {
+    B = 4;
     add('Nu mai este nevoie să asculți. Lasă vocea mea să se îndepărteze, ca o muzică în depărtare.', 8);
+    B = 3;
     add('Cu fiecare respirație ești tot mai greu, tot mai somnoros. Poți adormi acum, într-un somn liniștit și odihnitor.', 15);
+    B = 2;
     add('Noapte bună.', 5);
   } else {
+    B = 7;
     add('Acum este timpul să revii, în ritmul tău. Voi număra de la unu la cinci, și cu fiecare număr devii mai treaz și mai plin de energie.', 5);
-    add('Unu. Simți corpul, greutatea lui, locul în care ești.', 4);
-    add('Doi. Mișcă ușor degetele de la mâini și de la picioare.', 4);
-    add('Trei. Fă o respirație adâncă și lasă energia să revină în tot corpul.', 4);
-    add('Patru. Auzi sunetele din jur, ești aproape complet prezent.', 4);
-    add('Cinci. Deschide ochii. Ești treaz, odihnit, calm și atent. Bine ai revenit.', 3);
+    B = 8.5; add('Unu. Simți corpul, greutatea lui, locul în care ești.', 4);
+    B = 10; add('Doi. Mișcă ușor degetele de la mâini și de la picioare.', 4);
+    B = 11.5; add('Trei. Fă o respirație adâncă și lasă energia să revină în tot corpul.', 4);
+    B = 13; add('Patru. Auzi sunetele din jur, ești aproape complet prezent.', 4);
+    B = 14; add('Cinci. Deschide ochii. Ești treaz, odihnit, calm și atent. Bine ai revenit.', 3);
   }
   return s;
 }
@@ -117,6 +129,7 @@ async function ruleazaScript(steps, id) {
     if (id !== gId) return false;
     $('gtext').textContent = steps[i].t;
     $('gprog').style.width = (i / steps.length * 100) + '%';
+    if (steps[i].b && eng) setBeat(steps[i].b, steps[i].p + 8); // undele urmăresc faza ședinței
     await spune(steps[i].t, $('gfinal').value === 'somn' && $('gtip').value === 'hip' ? 0.75 : 1);
     if (id !== gId) return false;
     await dormi(steps[i].p * 1000);

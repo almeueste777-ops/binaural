@@ -157,6 +157,7 @@ a{color:var(--acc)}
 
   <details>
    <summary>Cum funcționează și ce poți aștepta</summary>
+   <p><b>În ședințele de hipnoză din aplicație (tabul Ghid)</b> undele urmăresc ce se spune: ~10 Hz la început (calm treaz), coboară spre ~6 Hz în aprofundare și la ~5,5 Hz (theta) când vin sugestiile, apoi urcă la ~14 Hz la trezire, sau coboară spre 2 Hz dacă ai ales somnul. Ritmul real al vocii depinde de telefon, de aceea trecerile sunt line, nu pe secundă. La înregistrările de pe YouTube nu pot sincroniza nimic.</p>
    <p>Într-o ureche auzi un ton, în cealaltă unul puțin diferit (ex. 195 Hz și 205 Hz). Creierul „aude” diferența (10 Hz) ca pe o bătaie lentă. Ideea: activitatea creierului tinde să se apropie de acel ritm.</p>
    <p><b>Delta</b> 0,5–4 Hz somn adânc · <b>Theta</b> 4–8 Hz reverie, meditație · <b>Alpha</b> 8–13 Hz calm treaz · <b>Beta</b> 13–30 Hz concentrare · <b>Gamma</b> 30+ Hz atenție înaltă.</p>
    <p>Sincer: dovezile științifice sunt <b>mixte și modeste</b>. Unele studii arată un efect mic asupra atenției, anxietății și somnului; altele nu găsesc nimic. Nu te face genial și nu „încarcă” memoria direct. Ajută cel mai mult ca <b>ritual</b>: același sunet, același loc, aceeași oră. „Transa” de aici înseamnă stare meditativă profundă, nu pierderea controlului. Jurnalul îți arată dacă ajută pe tine.</p>
@@ -217,6 +218,9 @@ a{color:var(--acc)}
   <section class="panel">
    <h2>🇷🇴 Hipnoză și meditație în română</h2>
    <p>Voci reale, de la oameni care fac asta profesional. Se deschide playerul oficial YouTube în aplicație, deci ai nevoie de internet. Nu le-am ascultat eu: alege după voce și după ce simți. Unele canale promit „vindecări” fără dovezi; ia-le ca relaxare, nu ca tratament.</p>
+   <label class="chk"><input type="checkbox" id="ytfond"> Pune și un fundal binaural, separat (experimental, cu căști)</label>
+   <label for="ytvol">Volum fundal binaural</label>
+   <input type="range" id="ytvol" min="0" max="100" value="15">
    <div id="ytlist"></div>
    <p class="mic">Cu YouTube nu merge fundalul binaural din aplicație (sunt două playere separate) și, pe iPhone, sunetul se oprește când blochezi ecranul, dacă nu ai YouTube Premium. Pentru somn, lasă ecranul aprins și întunecat sau alege sesiunile de mai jos.</p>
   </section>
@@ -225,6 +229,14 @@ a{color:var(--acc)}
    <h2>🎙 Înregistrări în engleză, cu mixaj binaural</h2>
    <p>Sesiuni de hipnoză și meditație ghidată, citite de oameni, cu licență Creative Commons (uz necomercial). Sunt în <b>engleză</b> și se încarcă de pe Internet Archive, deci ai nevoie de internet. Caută în rest o voce românească cu licență liberă: n-am găsit nicio sesiune de hipnoză în română.</p>
    <div id="reclist"></div>
+   <div class="rec" id="ownbox">
+    <b>Vocea ta sau un fișier al tău</b> <span class="tag">orice limbă</span>
+    <p>Alege o înregistrare de pe telefon (o sesiune de hipnoză pe care ai primit-o, propria voce citind un text) și aplicația pune dedesubt undele binaurale, cu volum separat.</p>
+    <input type="file" id="ownfile" accept="audio/*">
+    <label for="ownprog">Tip de unde dedesubt</label>
+    <select id="ownprog"><option value="relax">Relaxare (alpha)</option><option value="medit">Meditație / transă (theta)</option><option value="somn">Somn (spre delta)</option><option value="focus">Concentrare</option></select>
+    <button class="small ok" id="ownplay" style="margin-top:10px">▶ Ascultă</button>
+   </div>
    <div id="rstage" hidden>
     <h2 id="rtitlu" style="margin-bottom:8px"></h2>
     <div class="time" id="rinfo"></div>

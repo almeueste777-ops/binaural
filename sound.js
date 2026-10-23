@@ -18,6 +18,9 @@ const PROGRAME = [
   { id: 'creat', e: '🎨', nume: 'Creativitate', scop: 'Idei, improvizație, compus',
     desc: 'La granița alpha/theta (≈7–10 Hz), unde mulți raportează gânduri mai libere.',
     c: 190, dur: 30, pts: [[0, 10], [5, 9], [15, 7.5], [25, 8], [30, 10]], muz: 'luminos' },
+  { id: 'gamma', e: '⚡', nume: 'Gamma 40 Hz', scop: 'Atenție intensă, sesiuni scurte',
+    desc: 'Urcă spre 40 Hz (gamma). Dovezile sunt cele mai slabe dintre toate programele; încearcă 15 minute și vezi în jurnal dacă te ajută. Nu-l folosi seara.',
+    c: 250, dur: 15, pts: [[0, 12], [3, 25], [6, 40], [13, 40], [15, 14]], muz: 'luminos' },
   { id: 'relax', e: '🌊', nume: 'Relaxare', scop: 'Descărcat stresul',
     desc: 'Alpha lent (12 → 8 Hz): calm treaz, respirație lungă.',
     c: 160, dur: 20, pts: [[0, 12], [5, 10], [15, 8], [20, 8]], muz: 'calm' },
@@ -144,7 +147,7 @@ async function startSound(o) {
   const p = o.prog, total = o.min * 60;
   const scala = o.min / p.pts[p.pts.length - 1][0];
   const t0 = ctx.currentTime + 0.15;
-  const e = eng = { ctx, t0, total, o, wake: null, audioEl: null, fileEl: null };
+  const e = eng = { ctx, t0, total, o, wake: null, audioEl: null, fileEl: null, beat: [], dyn: null };
 
   const fade = ctx.createGain();
   fade.gain.setValueAtTime(0, t0);
@@ -170,6 +173,7 @@ async function startSound(o) {
       pts.forEach(([s, hz]) => osc.frequency.linearRampToValueAtTime(p.c + semn * hz / 2, t0 + s));
       osc.connect(merger, 0, i);
       oscs.push(osc);
+      e.beat.push({ p: osc.frequency, sign: semn, c: p.c });
     });
     merger.connect(tonuri);
   } else {
@@ -182,6 +186,7 @@ async function startSound(o) {
     lfo.connect(lg); lg.connect(amp.gain);
     osc.connect(amp); amp.connect(tonuri);
     oscs.push(osc, lfo);
+    e.beat.push({ p: lfo.frequency, sign: 0, c: p.c });
   }
 
   let nz = null;
@@ -255,11 +260,33 @@ async function startSound(o) {
   tickSunet();
 }
 
+// Frecvența de bătaie de acum (urmărește fie programul fix, fie ultima comandă setBeat)
+function beatNow(e) {
+  const t = e.ctx.currentTime;
+  if (e.dyn) {
+    const d = e.dyn;
+    return t >= d.t1 ? d.to : d.from + (d.to - d.from) * (t - d.t0) / (d.t1 - d.t0);
+  }
+  return interp(e.pts, Math.max(0, t - e.t0));
+}
+
+// Mută lin frecvența de bătaie spre `hz` în `secs` secunde (folosit ca undele să urmeze faza ședinței ghidate)
+function setBeat(hz, secs) {
+  const e = eng; if (!e || !e.beat.length) return;
+  const now = e.ctx.currentTime, from = beatNow(e), s = Math.max(1, secs);
+  e.beat.forEach(b => {
+    b.p.cancelScheduledValues(now);
+    b.p.setValueAtTime(b.sign ? b.c + b.sign * from / 2 : from, now);
+    b.p.linearRampToValueAtTime(b.sign ? b.c + b.sign * hz / 2 : hz, now + s);
+  });
+  e.dyn = { from, to: hz, t0: now, t1: now + s };
+}
+
 function tickSunet() {
   const e = eng; if (!e) return;
   const el = e.ctx.currentTime - e.t0;
   if (el >= e.total + 0.5) return finalSunet();
-  const t = Math.max(0, el), hz = interp(e.pts, t);
+  const t = Math.max(0, el), hz = beatNow(e);
   if (e.o.onTick) e.o.onTick(t, e.total, hz);
 }
 

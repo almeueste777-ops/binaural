@@ -122,10 +122,19 @@ async function deschideYT(v) {
   const b = card.querySelector('button');
   b.textContent = '✓ Gata'; b.className = 'small no';
   b.onclick = () => inchideYT(true);
+  if ($('ytfond').checked) { // fundal binaural separat (nu poate fi sincronizat cu vocea din YouTube)
+    try {
+      await startSound({
+        prog: progById(v.scop.startsWith('🌙') ? 'somn' : 'relax'), min: v.min + 2, mode: 'bin', noise: 'brown', noiseV: 30,
+        vol: +$('ytvol').value, music: 'none', musicV: 0, file: null, wake: false, onTick() {}, onEnd() {},
+      });
+    } catch (_) {}
+  }
 }
 
 function inchideYT(intreaba) {
   if (!ytCurent) return;
+  if (eng) stopSound(true);
   const card = $('yt-' + ytCurent.id);
   ytCurent = null;
   if (card) card.querySelector('.ytslot').innerHTML = '';
@@ -133,3 +142,17 @@ function inchideYT(intreaba) {
   if (intreaba) sfarsitSesiune(); else sesiune = null;
 }
 deseneazaYT();
+
+/* ============ Vocea ta (fișier de pe telefon), cu unde binaurale dedesubt ============ */
+$('ownplay').onclick = async () => {
+  const f = $('ownfile').files[0];
+  if (!f) { alert('Alege întâi un fișier audio (mp3, m4a, wav).'); return; }
+  const url = URL.createObjectURL(f);
+  const dur = await new Promise(res => {
+    const a = new Audio(); a.preload = 'metadata';
+    a.onloadedmetadata = () => res(a.duration); a.onerror = () => res(0);
+    a.src = url;
+  });
+  if (!dur || !isFinite(dur)) { alert('Nu pot citi fișierul acesta.'); return; }
+  porniInregistrare({ titlu: f.name, url, start: 0, end: 0, dur, prog: $('ownprog').value });
+};
